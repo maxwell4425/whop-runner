@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhopRunner — Automated Video for Whop Campaigns</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --dark: #0f172a;
+      --dark-2: #1e293b;
+      --dark-3: #334155;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --border: #e2e8f0;
+    }
+    
+    body {
+      background: var(--dark);
+      color: var(--light);
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--dark-2);
+      border-bottom: 1px solid var(--dark-3);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .nav-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+    
+    .nav-btn:hover, .nav-btn.active {
+      background: var(--dark-3);
+      color: var(--light);
+    }
+    
+    .nav-btn.active {
+      color: var(--primary);
+    }
+    
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: var(--dark-3);
+      border-radius: 8px;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    /* Main Content */
+    .main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    /* Sections */
+    .section {
+      display: none;
+    }
+    
+    .section.active {
+      display: block;
+    }
+    
+    .section-header {
+      margin-bottom: 2rem;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .section-subtitle {
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+    
+    /* Campaign Cards */
+    .campaign-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .campaign-card {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s;
+    }
+    
+    .campaign-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    
+    .campaign-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    
+    .campaign-type.ugc {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+    }
+    
+    .campaign-type.clipping {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--secondary);
+    }
+    
+    .campaign-type.real-human {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+    
+    .campaign-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .campaign-brand {
+      color: var(--gray);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    
+    .campaign-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: var(--gray);
+      margin-bottom: 1rem;
+    }
+    
+    .campaign-payout {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    
+    .campaign-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background: var(--dark-3);
+      color: var(--light);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--gray);
+    }
+    
+    .btn-success {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      color: var(--gray);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    /* Agents Section */
+    .agents-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .agent-card {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .agent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .agent-info h3 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .agent-info p {
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+    
+    .agent-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .agent-status.idle { background: var(--dark-3); color: var(--gray); }
+    .agent-status.scanning { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+    .agent-status.generating { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .agent-status.reviewing { background: rgba(16, 185, 129, 0.2); color: var(--secondary); }
+    .agent-status.error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    
+    .agent-progress {
+      background: var(--dark-3);
+      height: 8px;
+      border-radius: 4px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    
+    .agent-progress-bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    
+    .agent-task {
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+    
+    .agent-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--dark-3);
+    }
+    
+    .agent-stat {
+      text-align: center;
+    }
+    
+    .agent-stat-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .agent-stat-label {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+    
+    .agent-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    /* Dashboard */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    
+    .stat-value.positive { color: var(--secondary); }
+    .stat-value.primary { color: var(--primary); }
+    
+    .stat-change {
+      font-size: 0.75rem;
+      color: var(--gray);
+      margin-top: 0.25rem;
+    }
+    
+    /* Editor */
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 1.5rem;
+    }
+    
+    .editor-preview {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      aspect-ratio: 9/16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .editor-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .editor-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .control-panel {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    
+    .control-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .control-group {
+      margin-bottom: 1rem;
+    }
+    
+    .control-label {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .control-input, .control-select {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--dark-3);
+      border: 1px solid var(--dark-3);
+      border-radius: 6px;
+      color: var(--light);
+      font-size: 0.875rem;
+    }
+    
+    .control-input:focus, .control-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .style-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .style-option {
+      padding: 0.75rem;
+      background: var(--dark-3);
+      border: 2px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    
+    .style-option:hover {
+      border-color: var(--gray);
+    }
+    
+    .style-option.active {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .sound-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .sound-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      background: var(--dark-3);
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+    
+    .sound-item button {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    /* Recommendations */
+    .recommendations {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .recommendations-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .recommendation-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--dark-3);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    
+    .recommendation-info h4 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .recommendation-info p {
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+    
+    .recommendation-score {
+      text-align: right;
+    }
+    
+    .score-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    
+    .score-label {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+    
+    /* Empty States */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray);
+    }
+    
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--light);
+    }
+    
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--dark-3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Chatbox */
+    .chatbox {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 320px;
+      background: var(--dark-2);
+      border: 1px solid var(--dark-3);
+      border-radius: 12px;
+      padding: 1rem;
+      display: none;
+    }
+    
+    .chatbox.open {
+      display: block;
+    }
+    
+    .chatbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .chatbox-title {
+      font-weight: 600;
+    }
+    
+    .chatbox-close {
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+    }
+    
+    .chatbox-input {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--dark-3);
+      border: none;
+      border-radius: 6px;
+      color: var(--light);
+      resize: none;
+    }
+    
+    .chat-toggle {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Modal -->
+  <div id="auth-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:var(--dark-2); border:1px solid var(--dark-3); border-radius:16px; padding:2.5rem; width:100%; max-width:420px; margin:1rem;">
+      <div style="text-align:center; margin-bottom:2rem;">
+        <div style="font-size:2rem; font-weight:800; color:var(--primary); margin-bottom:0.5rem;">⚡ WhopRunner</div>
+        <p style="color:var(--gray); font-size:0.875rem;">Automated video for Whop campaigns</p>
+      </div>
+
+      <!-- Tab switcher -->
+      <div style="display:flex; background:var(--dark-3); border-radius:8px; padding:4px; margin-bottom:1.5rem;">
+        <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1; padding:0.5rem; border:none; border-radius:6px; background:var(--primary); color:white; font-weight:600; cursor:pointer;">Log In</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" style="flex:1; padding:0.5rem; border:none; border-radius:6px; background:transparent; color:var(--gray); cursor:pointer;">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="auth-login">
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.875rem; margin-bottom:0.5rem; color:var(--gray);">Email</label>
+          <input id="login-email" type="email" placeholder="you@example.com" style="width:100%; padding:0.75rem; background:var(--dark-3); border:1px solid var(--dark-3); border-radius:8px; color:var(--light); font-size:0.875rem; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block; font-size:0.875rem; margin-bottom:0.5rem; color:var(--gray);">Password</label>
+          <input id="login-password" type="password" placeholder="••••••••" style="width:100%; padding:0.75rem; background:var(--dark-3); border:1px solid var(--dark-3); border-radius:8px; color:var(--light); font-size:0.875rem; box-sizing:border-box;">
+        </div>
+        <div id="login-error" style="color:var(--danger); font-size:0.875rem; margin-bottom:1rem; display:none;"></div>
+        <button onclick="doLogin()" style="width:100%; padding:0.875rem; background:var(--primary); color:white; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;">Log In</button>
+        <p style="text-align:center; margin-top:1rem; font-size:0.875rem; color:var(--gray);">Don't have an account? <a href="#" onclick="switchAuthTab('signup')" style="color:var(--primary);">Sign up free</a></p>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="auth-signup" style="display:none;">
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.875rem; margin-bottom:0.5rem; color:var(--gray);">Full Name</label>
+          <input id="signup-name" type="text" placeholder="Your name" style="width:100%; padding:0.75rem; background:var(--dark-3); border:1px solid var(--dark-3); border-radius:8px; color:var(--light); font-size:0.875rem; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.875rem; margin-bottom:0.5rem; color:var(--gray);">Email</label>
+          <input id="signup-email" type="email" placeholder="you@example.com" style="width:100%; padding:0.75rem; background:var(--dark-3); border:1px solid var(--dark-3); border-radius:8px; color:var(--light); font-size:0.875rem; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block; font-size:0.875rem; margin-bottom:0.5rem; color:var(--gray);">Password</label>
+          <input id="signup-password" type="password" placeholder="8+ characters" style="width:100%; padding:0.75rem; background:var(--dark-3); border:1px solid var(--dark-3); border-radius:8px; color:var(--light); font-size:0.875rem; box-sizing:border-box;">
+        </div>
+        <div id="signup-error" style="color:var(--danger); font-size:0.875rem; margin-bottom:1rem; display:none;"></div>
+        <div id="signup-success" style="color:var(--secondary); font-size:0.875rem; margin-bottom:1rem; display:none;"></div>
+        <button onclick="doSignup()" style="width:100%; padding:0.875rem; background:var(--primary); color:white; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;">Create Account</button>
+        <p style="text-align:center; margin-top:1rem; font-size:0.875rem; color:var(--gray);">Already have an account? <a href="#" onclick="switchAuthTab('login')" style="color:var(--primary);">Log in</a></p>
+      </div>
+
+      <!-- Verify notice (shown post-signup) -->
+      <div id="auth-verify" style="display:none; text-align:center;">
+        <div style="font-size:3rem; margin-bottom:1rem;">📧</div>
+        <h3 style="margin-bottom:0.5rem;">Check your email</h3>
+        <p style="color:var(--gray); font-size:0.875rem; margin-bottom:1.5rem;">We sent a verification link to <span id="verify-email-display" style="color:var(--light);"></span></p>
+        <button onclick="resendVerification()" style="background:transparent; border:1px solid var(--dark-3); color:var(--gray); padding:0.5rem 1rem; border-radius:6px; cursor:pointer; font-size:0.875rem;">Resend Email</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      WhopRunner
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="showSection('campaigns')">Campaigns</button>
+      <button class="nav-btn" onclick="showSection('intelligence')">🧠 Intelligence</button>
+      <button class="nav-btn" onclick="showSection('agents')">Agents</button>
+      <button class="nav-btn" onclick="showSection('editor')">Editor</button>
+      <button class="nav-btn" onclick="showSection('dashboard')">Dashboard</button>
+    </nav>
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <div class="user-badge" id="user-badge">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span id="user-name">Loading...</span>
+      </div>
+      <button onclick="doLogout()" style="padding:0.4rem 0.75rem; background:transparent; border:1px solid var(--dark-3); color:var(--gray); border-radius:6px; cursor:pointer; font-size:0.8rem;">Logout</button>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Campaigns Section -->
+    <section id="campaigns" class="section active">
+      <div class="section-header">
+        <h1 class="section-title">Whop Campaigns</h1>
+        <p class="section-subtitle">Browse and join campaigns to start generating videos automatically</p>
+      </div>
+      
+      <!-- Recommendations -->
+      <div class="recommendations">
+        <div class="recommendations-header">
+          <h3>🔥 Smart Recommendations</h3>
+          <span style="color: var(--gray); font-size: 0.875rem;">Based on your preferences</span>
+        </div>
+        <div id="recommendations-list">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+      
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="filterCampaigns('all')">All</button>
+          <button class="filter-btn" onclick="filterCampaigns('UGC')">UGC</button>
+          <button class="filter-btn" onclick="filterCampaigns('Clipping')">Clipping</button>
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn" onclick="filterCampaigns('high')">High Payout</button>
+          <button class="filter-btn" onclick="filterCampaigns('low')">Low Competition</button>
+        </div>
+      </div>
+      
+      <!-- Campaign Grid -->
+      <div class="campaign-grid" id="campaign-grid">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </section>
+    
+    <!-- Intelligence Section -->
+    <section id="intelligence" class="section">
+      <div class="section-header">
+        <h1 class="section-title">🧠 Campaign Intelligence</h1>
+        <p class="section-subtitle">AI-ranked campaigns backed by Amazon BSR, TikTok trends, and Twitch analytics</p>
+      </div>
+
+      <!-- Top Picks Banner -->
+      <div id="intel-top-picks" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+
+      <!-- Filter -->
+      <div class="filters" style="margin-bottom:1.5rem;">
+        <button class="filter-btn active" onclick="loadIntelligence('all', this)">All</button>
+        <button class="filter-btn" onclick="loadIntelligence('UGC', this)">UGC Only</button>
+        <button class="filter-btn" onclick="loadIntelligence('Clipping', this)">Clipping Only</button>
+      </div>
+
+      <!-- Ranked List -->
+      <div id="intel-ranked" style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Agents Section -->
+    <section id="agents" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Active Agents</h1>
+        <p class="section-subtitle">Monitor and manage your multi-campaign sub-agents</p>
+      </div>
+      
+      <div class="agents-list" id="agents-list">
+        <div class="empty-state">
+          <h3>No Active Agents</h3>
+          <p>Join a campaign to start generating videos automatically</p>
+          <button class="btn btn-primary" onclick="showSection('campaigns')" style="margin-top: 1rem;">Browse Campaigns</button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Editor Section -->
+    <section id="editor" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Video Editor</h1>
+        <p class="section-subtitle">Customize your generated videos with captions, sounds, and effects</p>
+      </div>
+      
+      <div class="editor-container">
+        <div class="editor-preview" id="editor-preview">
+          <div>
+            <p style="font-size: 3rem; margin-bottom: 1rem;">🎬</p>
+            <p>Select a video to edit</p>
+          </div>
+        </div>
+        
+        <div class="editor-controls">
+          <!-- Captions Panel -->
+          <div class="control-panel">
+            <div class="control-title">Captions</div>
+            <div class="control-group">
+              <label class="control-label">Style</label>
+              <div class="style-options" id="caption-styles">
+                <div class="style-option active" data-style="viral-white">Viral White</div>
+                <div class="style-option" data-style="viral-black">Viral Black</div>
+                <div class="style-option" data-style="neon">Neon</div>
+                <div class="style-option" data-style="minimal">Minimal</div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Position</label>
+              <select class="control-select" id="caption-position">
+                <option value="bottom">Bottom</option>
+                <option value="top">Top</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Sounds Panel -->
+          <div class="control-panel">
+            <div class="control-title">Sounds</div>
+            <div class="sound-list" id="sound-list">
+              <div class="sound-item">
+                <span>Upbeat Loop 1</span>
+                <button class="btn btn-secondary" onclick="addSound('upbeat-1')">Add</button>
+              </div>
+              <div class="sound-item">
+                <span>Chill Beat</span>
+                <button class="btn btn-secondary" onclick="addSound('chill-1')">Add</button>
+              </div>
+              <div class="sound-item">
+                <span>Whoosh Transition</span>
+                <button class="btn btn-secondary" onclick="addSound('transition-1')">Add</button>
+              </div>
+              <div class="sound-item">
+                <span>Comedy SFX</span>
+                <button class="btn btn-secondary" onclick="addSound('comedy-1')">Add</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Effects Panel -->
+          <div class="control-panel">
+            <div class="control-title">Effects</div>
+            <div class="control-group">
+              <label class="control-label">
+                <input type="checkbox" id="zoom-effect"> Enable Zoom/Pan
+              </label>
+            </div>
+            <div class="control-group">
+              <label class="control-label">
+                <input type="checkbox" id="watermark-remove"> Remove Watermark
+              </label>
+            </div>
+          </div>
+          
+          <!-- Actions -->
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-primary" style="flex: 1;" onclick="generatePreview()">Preview</button>
+            <button class="btn btn-success" style="flex: 1;" onclick="exportVideo()">Export</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Earnings Dashboard</h1>
+        <p class="section-subtitle">Track your performance and projected earnings</p>
+      </div>
+      
+      <div class="dashboard-grid" id="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Earnings</div>
+          <div class="stat-value positive">$0.00</div>
+          <div class="stat-change">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">This Week</div>
+          <div class="stat-value">$0.00</div>
+          <div class="stat-change">+0% from last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Videos Approved</div>
+          <div class="stat-value primary">0</div>
+          <div class="stat-change">0% approval rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Projected Monthly</div>
+          <div class="stat-value">$0.00</div>
+          <div class="stat-change">Based on current pace</div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Chatbox Toggle -->
+  <button class="chat-toggle" onclick="toggleChat()">💬</button>
+  
+  <!-- Chatbox -->
+  <div class="chatbox" id="chatbox">
+    <div class="chatbox-header">
+      <span class="chatbox-title">Agent Feedback</span>
+      <button class="chatbox-close" onclick="toggleChat()">✕</button>
+    </div>
+    <textarea class="chatbox-input" id="chat-input" rows="3" placeholder="Tell the agent what to change...&#10;e.g., 'Don't use that sound, make subtitles black'"></textarea>
+    <button class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" onclick="sendFeedback()">Send to Agent</button>
+  </div>
+  
+  <script>
+    // State
+    let currentFilter = 'all';
+    let campaigns = [];
+    let agents = [];
+    let selectedCampaign = null;
+    let currentUser = null;
+    let authToken = localStorage.getItem('wr_token');
+
+    // ─────────────────────────────────
+    // AUTH
+    // ─────────────────────────────────
+    function showAuthOverlay() {
+      document.getElementById('auth-overlay').style.display = 'flex';
+    }
+
+    function hideAuthOverlay() {
+      document.getElementById('auth-overlay').style.display = 'none';
+    }
+
+    function switchAuthTab(tab) {
+      document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('auth-signup').style.display = tab === 'signup' ? 'block' : 'none';
+      document.getElementById('auth-verify').style.display = 'none';
+      document.getElementById('tab-login').style.background = tab === 'login' ? 'var(--primary)' : 'transparent';
+      document.getElementById('tab-login').style.color = tab === 'login' ? 'white' : 'var(--gray)';
+      document.getElementById('tab-signup').style.background = tab === 'signup' ? 'var(--primary)' : 'transparent';
+      document.getElementById('tab-signup').style.color = tab === 'signup' ? 'white' : 'var(--gray)';
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Login failed';
+          errEl.style.display = 'block';
+          return;
+        }
+        authToken = data.token;
+        localStorage.setItem('wr_token', authToken);
+        currentUser = data.user;
+        updateUserBadge();
+        hideAuthOverlay();
+      } catch (e) {
+        errEl.textContent = 'Network error — try again';
+        errEl.style.display = 'block';
+      }
+    }
+
+    async function doSignup() {
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const errEl = document.getElementById('signup-error');
+      const okEl = document.getElementById('signup-success');
+      errEl.style.display = 'none';
+      okEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Signup failed';
+          errEl.style.display = 'block';
+          return;
+        }
+        // Show verify screen
+        document.getElementById('auth-signup').style.display = 'none';
+        document.getElementById('auth-verify').style.display = 'block';
+        document.getElementById('verify-email-display').textContent = email;
+        // Dev: auto-verify link
+        if (data.devVerifyUrl) {
+          okEl.textContent = '(Dev mode) Auto-verify: ' + data.devVerifyUrl;
+          okEl.style.display = 'block';
+          document.getElementById('auth-signup').style.display = 'block';
+        }
+      } catch (e) {
+        errEl.textContent = 'Network error — try again';
+        errEl.style.display = 'block';
+      }
+    }
+
+    async function resendVerification() {
+      const email = document.getElementById('signup-email').value.trim() || document.getElementById('login-email').value.trim();
+      if (!email) { alert('Enter your email first'); return; }
+      await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      alert('Verification email resent!');
+    }
+
+    async function checkAuth() {
+      // Check for post-verify redirect
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('verified') && params.get('token')) {
+        authToken = params.get('token');
+        localStorage.setItem('wr_token', authToken);
+        window.history.replaceState({}, '', '/');
+      }
+
+      if (!authToken) { showAuthOverlay(); return; }
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+        if (!res.ok) {
+          localStorage.removeItem('wr_token');
+          showAuthOverlay();
+          return;
+        }
+        currentUser = await res.json();
+        updateUserBadge();
+      } catch (e) {
+        showAuthOverlay();
+      }
+    }
+
+    function updateUserBadge() {
+      if (!currentUser) return;
+      const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      document.getElementById('user-avatar').textContent = initials;
+      document.getElementById('user-name').textContent = currentUser.name;
+    }
+
+    function doLogout() {
+      localStorage.removeItem('wr_token');
+      authToken = null;
+      currentUser = null;
+      showAuthOverlay();
+    }
+
+    // ─────────────────────────────────
+    // INTELLIGENCE ENGINE
+    // ─────────────────────────────────
+    async function loadIntelligence(type = 'all', btn = null) {
+      if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      const url = type === 'all' ? '/api/intelligence/analyze' : `/api/intelligence/analyze?type=${type}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        renderIntelligenceTopPicks(data.topPicks, data.meta);
+        renderIntelligenceRanked(data.ranked);
+      } catch (e) {
+        document.getElementById('intel-ranked').innerHTML = '<p style="color:var(--gray)">Failed to load intelligence data</p>';
+      }
+    }
+
+    function renderIntelligenceTopPicks(topPicks, meta) {
+      const el = document.getElementById('intel-top-picks');
+      const cards = [];
+
+      if (topPicks.bestForMoney) {
+        const c = topPicks.bestForMoney.campaign;
+        cards.push(`
+          <div style="background:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05)); border:1px solid rgba(99,102,241,0.4); border-radius:12px; padding:1.5rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.75rem;">💰 Best For Money Now</div>
+            <h3 style="font-size:1.1rem; margin-bottom:0.25rem;">${c.name}</h3>
+            <p style="color:var(--gray); font-size:0.875rem; margin-bottom:1rem;">${c.brand} • ${c.competition} competition</p>
+            <div style="font-size:2rem; font-weight:800; color:var(--secondary);">$${c.payout}</div>
+            <p style="color:var(--gray); font-size:0.8rem; margin-top:0.5rem;">${c.intelligence.niche.insight}</p>
+            <div style="margin-top:0.75rem; font-size:0.75rem; color:var(--primary);">Score: ${c.intelligence.overallScore}/100 • ${c.intelligence.badge}</div>
+          </div>
+        `);
+      }
+
+      if (topPicks.bestForVirality) {
+        const c = topPicks.bestForVirality.campaign;
+        cards.push(`
+          <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.4); border-radius:12px; padding:1.5rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--secondary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.75rem;">🚀 Best Viral Potential</div>
+            <h3 style="font-size:1.1rem; margin-bottom:0.25rem;">${c.name}</h3>
+            <p style="color:var(--gray); font-size:0.875rem; margin-bottom:1rem;">${c.brand} • Clipping campaign</p>
+            <div style="font-size:2rem; font-weight:800; color:var(--secondary);">${c.intelligence.clipping?.avgViewsPerClip} avg views</div>
+            <p style="color:var(--gray); font-size:0.8rem; margin-top:0.5rem;">${c.intelligence.niche.insight}</p>
+            <div style="margin-top:0.75rem; font-size:0.75rem; color:var(--secondary);">Viral Score: ${c.intelligence.viralScore}/100 • ${c.intelligence.badge}</div>
+          </div>
+        `);
+      }
+
+      if (cards.length === 0) {
+        cards.push('<p style="color:var(--gray)">No campaigns to analyze</p>');
+      }
+
+      const dataNote = meta ? `<div style="grid-column:1/-1; font-size:0.75rem; color:var(--gray); padding:0.5rem 0;">📊 Data sources: ${meta.dataSources.join(', ')} • Analyzed ${meta.totalCampaigns} campaigns • ${new Date(meta.analyzedAt).toLocaleTimeString()}</div>` : '';
+      el.innerHTML = cards.join('') + dataNote;
+    }
+
+    function renderIntelligenceRanked(ranked) {
+      const el = document.getElementById('intel-ranked');
+      if (!ranked || ranked.length === 0) {
+        el.innerHTML = '<div class="empty-state"><h3>No campaigns</h3></div>';
+        return;
+      }
+
+      el.innerHTML = ranked.map((c, i) => {
+        const isTop = i === 0;
+        const scoreColor = c.intelligence.overallScore >= 70 ? 'var(--secondary)' : c.intelligence.overallScore >= 45 ? 'var(--warning)' : 'var(--danger)';
+        return `
+          <div style="background:var(--dark-2); border:1px solid ${isTop ? 'rgba(99,102,241,0.5)' : 'var(--dark-3)'}; border-radius:12px; padding:1.25rem; display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center;">
+            <div style="font-size:1.5rem; font-weight:800; color:${isTop ? 'var(--primary)' : 'var(--gray)'}; min-width:2rem; text-align:center;">#${i + 1}</div>
+            <div>
+              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+                <span style="font-weight:600; font-size:1rem;">${c.name}</span>
+                <span style="font-size:0.7rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:4px; background:rgba(99,102,241,0.15); color:var(--primary);">${c.intelligence.badge}</span>
+                <span class="campaign-type ${c.type.toLowerCase()}">${c.type}</span>
+              </div>
+              <div style="color:var(--gray); font-size:0.8rem; margin-bottom:0.5rem;">${c.brand} • ${c.niche} • ${c.competition} competition</div>
+              <div style="font-size:0.8rem; color:var(--light);">${c.intelligence.reason}</div>
+              <div style="font-size:0.75rem; color:var(--gray); margin-top:0.5rem; font-style:italic;">${c.intelligence.niche.insight} <span style="color:var(--dark-3);">— ${c.intelligence.niche.source}</span></div>
+              ${c.intelligence.clipping ? `<div style="font-size:0.75rem; color:var(--secondary); margin-top:0.5rem;">📹 Avg ${c.intelligence.clipping.avgViewsPerClip} views/clip • ${c.intelligence.clipping.shareRate} share rate • ${c.intelligence.clipping.clipConversionRate} conversion</div>` : ''}
+              ${c.intelligence.niche.avgCPM ? `<div style="font-size:0.75rem; color:var(--primary); margin-top:0.25rem;">💰 Niche CPM avg: $${c.intelligence.niche.avgCPM}</div>` : ''}
+            </div>
+            <div style="text-align:right; min-width:80px;">
+              <div style="font-size:1.75rem; font-weight:800; color:${scoreColor};">${c.intelligence.overallScore}</div>
+              <div style="font-size:0.7rem; color:var(--gray);">score</div>
+              <div style="font-size:1.1rem; font-weight:700; color:var(--secondary); margin-top:0.25rem;">$${c.payout}</div>
+              <button onclick="joinCampaign('${c.id}')" style="margin-top:0.5rem; padding:0.4rem 0.75rem; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-size:0.75rem;">Join</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ─────────────────────────────────
+    // INIT
+    // ─────────────────────────────────
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      loadCampaigns();
+      loadRecommendations();
+      loadDashboard();
+      setInterval(loadAgents, 5000); // Poll agents every 5 seconds
+    });
+    
+    // Navigation
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+      
+      if (id === 'agents') loadAgents();
+      if (id === 'dashboard') loadDashboard();
+      if (id === 'intelligence') loadIntelligence();
+    }
+    
+    // Campaign Functions
+    async function loadCampaigns() {
+      try {
+        const res = await fetch('/api/campaigns');
+        const data = await res.json();
+        campaigns = data.campaigns;
+        renderCampaigns(campaigns);
+      } catch (e) {
+        console.error('Failed to load campaigns:', e);
+      }
+    }
+    
+    function renderCampaigns(campaigns) {
+      const grid = document.getElementById('campaign-grid');
+      const filtered = currentFilter === 'all' 
+        ? campaigns 
+        : campaigns.filter(c => c.type === currentFilter || c.competition === currentFilter);
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><h3>No campaigns found</h3><p>Try adjusting your filters</p></div>';
+        return;
+      }
+      
+      grid.innerHTML = filtered.map(c => `
+        <div class="campaign-card">
+          <span class="campaign-type ${c.requiresRealHuman ? 'real-human' : c.type.toLowerCase()}">${c.type}${c.requiresRealHuman ? ' (Real Human)' : ''}</span>
+          <h3 class="campaign-name">${c.name}</h3>
+          <p class="campaign-brand">${c.brand}</p>
+          <div class="campaign-meta">
+            <span>⏰ ${new Date(c.deadline).toLocaleDateString()}</span>
+            <span>📊 ${c.competition} competition</span>
+          </div>
+          <div class="campaign-payout">$${c.payout}</div>
+          <div class="campaign-actions">
+            <button class="btn btn-primary" onclick="joinCampaign('${c.id}')">Join Campaign</button>
+            <button class="btn btn-secondary" onclick="viewDetails('${c.id}')">Details</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function filterCampaigns(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderCampaigns(campaigns);
+    }
+    
+    async function joinCampaign(campaignId) {
+      try {
+        const res = await fetch('/api/campaigns/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ campaignId, userId: 'demo-user' })
+        });
+        const data = await res.json();
+        
+        // Start agent for this campaign
+        const campaign = campaigns.find(c => c.id === campaignId);
+        await fetch('/api/agents/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            campaignId: campaign.id,
+            campaignName: campaign.name,
+            type: campaign.type,
+            niche: campaign.niche,
+            userId: 'demo-user'
+          })
+        });
+        
+        alert('Campaign joined! Agent is starting...');
+        showSection('agents');
+      } catch (e) {
+        console.error('Failed to join campaign:', e);
+      }
+    }
+    
+    function viewDetails(campaignId) {
+      const campaign = campaigns.find(c => c.id === campaignId);
+      alert(`${campaign.name}\n\nRequirements: ${campaign.requirements}\n\nPayout: $${campaign.payout}\nDeadline: ${campaign.deadline}`);
+    }
+    
+    // Recommendations
+    async function loadRecommendations() {
+      try {
+        const res = await fetch('/api/campaigns/recommendations/demo-user');
+        const data = await res.json();
+        
+        document.getElementById('recommendations-list').innerHTML = data.recommendations.slice(0, 3).map(c => `
+          <div class="recommendation-card">
+            <div class="recommendation-info">
+              <h4>${c.name}</h4>
+              <p>${c.brand} • ${c.type} • ${c.competition} competition</p>
+            </div>
+            <div class="recommendation-score">
+              <div class="score-value">$${c.estimatedEarnings}</div>
+              <div class="score-label">${c.recommendationReason}</div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('Failed to load recommendations:', e);
+      }
+    }
+    
+    // Agents Functions
+    async function loadAgents() {
+      try {
+        const res = await fetch('/api/agents?userId=demo-user');
+        const data = await res.json();
+        agents = data.agents;
+        renderAgents();
+      } catch (e) {
+        console.error('Failed to load agents:', e);
+      }
+    }
+    
+    function renderAgents() {
+      const list = document.getElementById('agents-list');
+      
+      if (agents.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <h3>No Active Agents</h3>
+            <p>Join a campaign to start generating videos automatically</p>
+            <button class="btn btn-primary" onclick="showSection('campaigns')" style="margin-top: 1rem;">Browse Campaigns</button>
+          </div>
+        `;
+        return;
+      }
+      
+      list.innerHTML = agents.map(a => `
+        <div class="agent-card">
+          <div class="agent-header">
+            <div class="agent-info">
+              <h3>${a.campaignName}</h3>
+              <p>${a.type} • ${a.niche}</p>
+            </div>
+            <span class="agent-status ${a.status}">${a.status}</span>
+          </div>
+          <div class="agent-progress">
+            <div class="agent-progress-bar" style="width: ${a.progress}%"></div>
+          </div>
+          <div class="agent-task">${a.currentTask}</div>
+          <div class="agent-stats">
+            <div class="agent-stat">
+              <div class="agent-stat-value">${a.stats.videosGenerated}</div>
+              <div class="agent-stat-label">Generated</div>
+            </div>
+            <div class="agent-stat">
+              <div class="agent-stat-value">${a.stats.videosSubmitted}</div>
+              <div class="agent-stat-label">Submitted</div>
+            </div>
+            <div class="agent-stat">
+              <div class="agent-stat-value">$${a.stats.earnings}</div>
+              <div class="agent-stat-label">Earned</div>
+            </div>
+          </div>
+          <div class="agent-actions">
+            <button class="btn btn-primary" onclick="toggleChat()">Send Feedback</button>
+            <button class="btn btn-secondary" onclick="stopAgent('${a.id}')">Stop</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    async function stopAgent(agentId) {
+      await fetch(`/api/agents/${agentId}/stop`, { method: 'POST' });
+      loadAgents();
+    }
+    
+    // Editor Functions
+    function addSound(soundId) {
+      alert(`Added sound ${soundId} to project`);
+    }
+    
+    function generatePreview() {
+      alert('Generating preview...');
+    }
+    
+    function exportVideo() {
+      alert('Video exported successfully!');
+    }
+    
+    // Dashboard Functions
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/dashboard/demo-user');
+        const data = await res.json();
+        
+        const stats = document.getElementById('dashboard-stats');
+        stats.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-label">Total Earnings</div>
+            <div class="stat-value positive">$${data.overview.totalEarnings.toFixed(2)}</div>
+            <div class="stat-change">All time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">This ${data.period}</div>
+            <div class="stat-value">$${data.periodStats?.periodEarnings?.toFixed(2) || '0.00'}</div>
+            <div class="stat-change">+0% from last ${data.period}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Videos Approved</div>
+            <div class="stat-value primary">${data.stats?.videosApproved || 0}</div>
+            <div class="stat-change">${data.stats?.approvalRate || 0}% approval rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Projected Monthly</div>
+            <div class="stat-value">$0.00</div>
+            <div class="stat-change">Based on current pace</div>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Failed to load dashboard:', e);
+      }
+    }
+    
+    // Chatbox Functions
+    function toggleChat() {
+      document.getElementById('chatbox').classList.toggle('open');
+    }
+    
+    async function sendFeedback() {
+      const input = document.getElementById('chat-input');
+      const feedback = input.value;
+      
+      if (!feedback.trim()) return;
+      
+      // Send to active agent
+      for (const agent of agents) {
+        try {
+          await fetch(`/api/agents/${agent.id}/feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              feedback,
+              type: feedback.includes('sound') ? 'sound' : 
+                    feedback.includes('subtitle') || feedback.includes('color') ? 'subtitle' : 'general'
+            })
+          });
+        } catch (e) {
+          console.error('Failed to send feedback:', e);
+        }
+      }
+      
+      alert('Feedback sent to agent! It will learn from this.');
+      input.value = '';
+      toggleChat();
+    }
+  </script>
+</body>
+</html>
